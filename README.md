@@ -3,7 +3,8 @@
 1.1.	Sistemos paskirtis
 Sistema bus skirta patogesnei vizito registracijai pas odontologą. Sistemoje egzistuos 3 rolės – tai yra odontologas, registruotas vartotojas bei svečias. Svečias turės galimybę tik 
 peržiūrėti laisvus vizitų laikus. Norėdamas užsiregistruoti į vizitą, asmuo pirmiausiai turės užsiregistruoti sistemoje. Odontologas matys visas registracijas, kokios yra įvykdytos.
-1.2.	Funkciniai reikalavimai
+1.2. Taikomosios srities objektai yra Paciento kortelė -> Vizitas -> Atsiliepimas apie vizitą
+1.3.	Funkciniai reikalavimai
 Neregistruotas sistemos naudotojas galės:
 
 1.	Peržiūrėti laisvus vizitų laikus pas specialistus.
