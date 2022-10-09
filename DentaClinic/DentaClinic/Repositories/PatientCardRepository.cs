@@ -7,7 +7,7 @@ namespace DentaClinic.Repositories
     public interface IPatientCardRepository
     {
         Task<List<PatientCard>> GetAll();
-        Task<PatientCard> Get(int id);
+        Task<PatientCard?> Get(int id);
         Task<PatientCard> Create(PatientCard patientCard);
         Task<PatientCard> Update(PatientCard patientCard);
         Task Delete(PatientCard patientCard);
@@ -34,7 +34,7 @@ namespace DentaClinic.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<PatientCard> Get(int id)
+        public async Task<PatientCard?> Get(int id)
         {
             return await _dbContext.PatientCards.FirstOrDefaultAsync(card => card.Id == id);
         }

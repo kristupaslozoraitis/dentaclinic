@@ -1,4 +1,6 @@
+using DentaClinic.Controllers;
 using DentaClinic.Database;
+using DentaClinic.Models;
 using DentaClinic.Repositories;
 using DentaClinic.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -21,9 +23,12 @@ builder.Services.AddDbContext<WebDbContext>(options =>
     options.UseMySql(connetionString, ServerVersion.AutoDetect(connetionString));
 });
 
+builder.Services.AddScoped<PatientCardController>();
+builder.Services.AddScoped<VisitController>();
+builder.Services.AddScoped<FeedbackController>();
 builder.Services.AddScoped<IPatientCardRepository, PatientCardRepository>();
-builder.Services.AddTransient<IVisitRepository, VisitRepository>();
-builder.Services.AddTransient<IFeedbackRepository, FeedbackRepository>();
+builder.Services.AddScoped<IVisitRepository, VisitRepository>();
+builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 
 var app = builder.Build();
 app.UseSwagger();

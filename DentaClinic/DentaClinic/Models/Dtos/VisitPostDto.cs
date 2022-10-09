@@ -1,9 +1,7 @@
-﻿namespace DentaClinic.Models
+﻿namespace DentaClinic.Models.Dtos
 {
-    public class Visit
+    public class VisitPostDto
     {
-        public int Id { get; set; }
-        public PatientCard PatientCard { get; set; }
         public DateTime Time { get; set; }
         public string DoctorName { get; set; }
         public string DoctorSurname { get; set; }

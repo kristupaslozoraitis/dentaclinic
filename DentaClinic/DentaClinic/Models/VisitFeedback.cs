@@ -4,6 +4,6 @@
     {
         public int Id { get; set; }
         public string Feedback { get; set; }
-        public int VisitId { get; set; }
+        public Visit Visit { get; set; }
     }
 }

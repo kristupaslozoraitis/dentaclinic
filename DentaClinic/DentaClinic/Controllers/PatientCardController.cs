@@ -1,4 +1,5 @@
 ﻿using DentaClinic.Models;
+using DentaClinic.Models.Dtos;
 using DentaClinic.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,35 +18,87 @@ namespace DentaClinic.Controllers
         }
 
         [HttpGet]
-        public async Task<List<PatientCard>> GetAll()
+        public async Task<IEnumerable<PatientCardDto>> GetAll()
         {
-            return await _patientCards.GetAll();
+            var cards = await _patientCards.GetAll();
+
+            return cards.Select(card => new PatientCardDto
+            {
+                Id = card.Id,
+                Name = card.Name,
+                Surname = card.Surname,
+                BirthDate = card.BirthDate,
+                PersonalNumber = card.PersonalNumber,
+                HomeAddress = card.HomeAddress,
+                PhoneNumber = card.PhoneNumber,
+                Height = card.Height,
+                Weight = card.Weight,
+            });
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PatientCard>> Get(int id)
+        public async Task<ActionResult<PatientCardDto>> Get(int id)
         {
             var card = await _patientCards.Get(id);
             if (card == null) return NotFound();
 
-            return Ok(card);
+            return Ok(new PatientCardDto
+            {
+                Id = card.Id,
+                Name = card.Name,
+                Surname = card.Surname,
+                BirthDate = card.BirthDate,
+                PersonalNumber = card.PersonalNumber,
+                HomeAddress = card.HomeAddress,
+                PhoneNumber = card.PhoneNumber,
+                Height = card.Height,
+                Weight = card.Weight,
+            });
         }
 
         [HttpPost]
-        public async Task<ActionResult<PatientCard>> Post(PatientCard card)
+        public async Task<ActionResult<PatientCardDto>> Post(PatientCardPostDto card)
         {
-            await _patientCards.Create(card);
+            var newCard = new PatientCard
+            {
+                Name = card.Name,
+                Surname = card.Surname,
+                BirthDate = card.BirthDate,
+                PersonalNumber = card.PersonalNumber,
+                HomeAddress = card.HomeAddress,
+                PhoneNumber = card.PhoneNumber,
+                Height = card.Height,
+                Weight = card.Weight,
+            };
 
-            return Created($"/api/v1/patientsCards/{card.Id}", card);
+            await _patientCards.Create(newCard);
+
+            return Created($"/api/v1/patientsCards/{newCard.Id}", new PatientCardDto
+            {
+                Id = newCard.Id,
+                Name = newCard.Name,
+                Surname = newCard.Surname,
+                BirthDate = newCard.BirthDate,
+                PersonalNumber = newCard.PersonalNumber,
+                HomeAddress = newCard.HomeAddress,
+                PhoneNumber = newCard.PhoneNumber,
+                Height = newCard.Height,
+                Weight = newCard.Weight,
+            });
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<PatientCard>> Update(PatientCard patientCard, int id)
+        public async Task<ActionResult<PatientCard>> Update(PatientCardUpdateDto patientCardDto, int id)
         {
-            var card = _patientCards.Get(id);
+            var card = await _patientCards.Get(id);
             if (card == null) return NotFound();
 
-            await _patientCards.Update(patientCard);
+            card.Height = patientCardDto.Height;
+            card.Weight = patientCardDto.Weight;
+            card.HomeAddress = patientCardDto.HomeAddress;
+            card.PhoneNumber = patientCardDto.PhoneNumber;
+
+            await _patientCards.Update(card);
 
             return Ok();
         }

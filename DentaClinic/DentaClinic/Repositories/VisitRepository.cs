@@ -42,7 +42,7 @@ namespace DentaClinic.Repositories
 
         public async Task<List<Visit>> GetAll(int patientCardId)
         {
-            return await _dbContext.Visits.Where(visit => visit.PatientCardId == patientCardId).ToListAsync();
+            return await _dbContext.Visits.Where(visit => visit.PatientCard.Id == patientCardId).ToListAsync();
         }
 
         public async Task<Visit> Update(Visit visit)

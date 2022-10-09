@@ -1,11 +1,7 @@
-﻿using DentaClinic.Utils;
-using System.Text.Json.Serialization;
-
-namespace DentaClinic.Models
+﻿namespace DentaClinic.Models.Dtos
 {
-    public class PatientCard
+    public class PatientCardPostDto
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
         public DateOnly BirthDate { get; set; }
