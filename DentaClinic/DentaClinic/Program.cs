@@ -20,7 +20,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<WebDbContext>(options => 
 {
     var connetionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseMySql(connetionString, ServerVersion.AutoDetect(connetionString));
+    options.UseSqlServer(connetionString);
 });
 
 builder.Services.AddScoped<PatientCardController>();
