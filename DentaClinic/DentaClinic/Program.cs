@@ -1,3 +1,6 @@
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using DentaClinic.Controllers;
 using DentaClinic.Database;
 using DentaClinic.Models;
@@ -17,11 +20,13 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Configuration.AddAzureKeyVault(new SecretClient(new Uri(builder.Configuration.GetValue<string>("KeyVaultUri")), new DefaultAzureCredential()), new KeyVaultSecretManager());
 builder.Services.AddDbContext<WebDbContext>(options => 
 {
     var connetionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseSqlServer(connetionString);
+    options.UseSqlServer(builder.Configuration.GetSection("ConnectionString").Value.ToString());
 });
+
 
 builder.Services.AddScoped<PatientCardController>();
 builder.Services.AddScoped<VisitController>();
