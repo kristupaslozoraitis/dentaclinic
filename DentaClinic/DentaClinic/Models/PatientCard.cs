@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace DentaClinic.Models
 {
-    public class PatientCard
+    public class PatientCard : IUserOwnedResource
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -14,5 +14,7 @@ namespace DentaClinic.Models
         public string PhoneNumber { get; set; }
         public int Height { get; set; }
         public int Weight { get; set; }
+        public string UserId { get; set; }
+        public User User { get; set; }
     }
 }

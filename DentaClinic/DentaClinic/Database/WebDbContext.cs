@@ -1,9 +1,10 @@
 ﻿using DentaClinic.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DentaClinic.Database
 {
-    public class WebDbContext : DbContext
+    public class WebDbContext : IdentityDbContext<User>
     {
         public WebDbContext(DbContextOptions<WebDbContext> options)
             : base(options) { }

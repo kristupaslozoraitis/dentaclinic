@@ -1,16 +1,23 @@
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using DentaClinic.Auth;
 using DentaClinic.Controllers;
 using DentaClinic.Database;
 using DentaClinic.Models;
 using DentaClinic.Repositories;
 using DentaClinic.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Configuration;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 // Add services to the container.
 builder.Services.AddRazorPages();
 
@@ -23,9 +30,24 @@ builder.Services.AddSwaggerGen();
 builder.Configuration.AddAzureKeyVault(new SecretClient(new Uri(builder.Configuration.GetValue<string>("KeyVaultUri")), new DefaultAzureCredential()), new KeyVaultSecretManager());
 builder.Services.AddDbContext<WebDbContext>(options => 
 {
-    var connetionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseSqlServer(builder.Configuration.GetSection("ConnectionString").Value.ToString());
 });
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<WebDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(configureOptions: options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters.ValidAudience = builder.Configuration["JWT:ValidAudience"];
+        options.TokenValidationParameters.ValidIssuer = builder.Configuration["JWT:ValidIssuer"];
+        options.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]));
+    });
 
 
 builder.Services.AddScoped<PatientCardController>();
@@ -34,6 +56,15 @@ builder.Services.AddScoped<FeedbackController>();
 builder.Services.AddScoped<IPatientCardRepository, PatientCardRepository>();
 builder.Services.AddScoped<IVisitRepository, VisitRepository>();
 builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
+builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<AuthDbSeeder>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(PolicyNames.ResourceOwner, policy => policy.Requirements.Add(new ResourceOwnerRequirement()));
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, ResourceOwnerAuthorizationHandler>();
 
 var app = builder.Build();
 app.UseSwagger();
@@ -54,8 +85,12 @@ app.UseRouting();
 
 app.MapControllers();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+var dbSeeder = app.Services.CreateScope().ServiceProvider.GetRequiredService<AuthDbSeeder>();
+await dbSeeder.SeedAsync();
 
 app.Run();

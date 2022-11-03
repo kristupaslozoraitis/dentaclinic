@@ -1,8 +1,11 @@
 ﻿using DentaClinic.Models;
 using DentaClinic.Models.Dtos;
 using DentaClinic.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace DentaClinic.Controllers
 {
@@ -11,10 +14,12 @@ namespace DentaClinic.Controllers
     public class PatientCardController : ControllerBase
     {
         private readonly IPatientCardRepository _patientCards;
+        private readonly IAuthorizationService _authorizationService;
 
-        public PatientCardController(IPatientCardRepository patientCards)
+        public PatientCardController(IPatientCardRepository patientCards, IAuthorizationService authorizationService)
         {
             _patientCards = patientCards;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -57,6 +62,7 @@ namespace DentaClinic.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<PatientCardDto>> Post(PatientCardPostDto card)
         {
             var newCard = new PatientCard
@@ -69,6 +75,7 @@ namespace DentaClinic.Controllers
                 PhoneNumber = card.PhoneNumber,
                 Height = card.Height,
                 Weight = card.Weight,
+                UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
             };
 
             await _patientCards.Create(newCard);
@@ -88,10 +95,17 @@ namespace DentaClinic.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<PatientCard>> Update(PatientCardUpdateDto patientCardDto, int id)
         {
             var card = await _patientCards.Get(id);
             if (card == null) return NotFound();
+
+            var authResult = await _authorizationService.AuthorizeAsync(User, card, PolicyNames.ResourceOwner);
+            if (!authResult.Succeeded)
+            {
+                return Forbid();
+            }
 
             card.Height = patientCardDto.Height;
             card.Weight = patientCardDto.Weight;
