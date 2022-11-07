@@ -31,6 +31,12 @@ namespace DentaClinic.Controllers
             var card = await _patientCardsRepository.Get(patientCardId);
             if (card == null) return NotFound();
 
+            var authResult = await _authorizationService.AuthorizeAsync(User, card, PolicyNames.ResourceOwner);
+            if (!authResult.Succeeded)
+            {
+                return Forbid();
+            }
+
             var visits = await _visits.GetAll(patientCardId);
 
             return Ok(visits.Select(visit => new VisitDto

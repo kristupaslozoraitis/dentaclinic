@@ -16,9 +16,9 @@ namespace DentaClinic.Auth
 
         public JwtTokenService(IConfiguration configuration)
         {
-            _audienice = configuration["JWT:ValidAudience"];
-            _issuer = configuration["JWT:ValidIssuer"];
-            _authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
+            _audienice = configuration.GetSection("ValidAudience").Value.ToString();
+            _issuer = configuration.GetSection("ValidIssuer").Value.ToString();
+            _authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("Secret").Value.ToString()));
         }
 
         public string CreateAccessToken(string email, string userId, IEnumerable<string> userRoles)
