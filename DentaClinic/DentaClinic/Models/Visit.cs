@@ -1,6 +1,8 @@
-﻿namespace DentaClinic.Models
+﻿using DentaClinic.Utils;
+
+namespace DentaClinic.Models
 {
-    public class Visit
+    public class Visit : IUserOwnedResource
     {
         public int Id { get; set; }
         public PatientCard PatientCard { get; set; }

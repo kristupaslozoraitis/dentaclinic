@@ -1,7 +1,10 @@
 ﻿using DentaClinic.Models;
 using DentaClinic.Models.Dtos;
 using DentaClinic.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace DentaClinic.Controllers
 {
@@ -10,15 +13,19 @@ namespace DentaClinic.Controllers
     public class VisitController : ControllerBase
     {
         private readonly IPatientCardRepository _patientCardsRepository;
+        private readonly IAuthorizationService _authorizationService;
         private readonly IVisitRepository _visits;
 
-        public VisitController(IVisitRepository visits, IPatientCardRepository patientCardRepository)
+        public VisitController(IVisitRepository visits, IPatientCardRepository patientCardRepository, IAuthorizationService authorizationService)
         {
             _patientCardsRepository = patientCardRepository;
+            _authorizationService = authorizationService;
             _visits = visits;
+
         }
 
         [HttpGet]
+        [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<IEnumerable<VisitDto>>> GetAll(int patientCardId)
         {
             var card = await _patientCardsRepository.Get(patientCardId);
@@ -37,6 +44,7 @@ namespace DentaClinic.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<VisitDto>> Get(int id, int patientCardId)
         {
             var card = await _patientCardsRepository.Get(patientCardId);
@@ -44,6 +52,12 @@ namespace DentaClinic.Controllers
 
             var visit = await _visits.Get(id);
             if (visit == null) return NotFound();
+
+            var authResult = await _authorizationService.AuthorizeAsync(User, visit, PolicyNames.ResourceOwner);
+            if (!authResult.Succeeded)
+            {
+                return Forbid();
+            }
 
             return Ok(new VisitDto
             {
@@ -56,10 +70,17 @@ namespace DentaClinic.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<VisitDto>> Post(VisitPostDto visitDto, int patientCardId)
         {
             var card = await _patientCardsRepository.Get(patientCardId);
             if (card == null) return NotFound();
+
+            var authResult = await _authorizationService.AuthorizeAsync(User, card, PolicyNames.ResourceOwner);
+            if (!authResult.Succeeded)
+            {
+                return Forbid();
+            }
 
             var visit = new Visit
             {
@@ -68,6 +89,7 @@ namespace DentaClinic.Controllers
                 DoctorSurname = visitDto.DoctorSurname,
                 Service = visitDto.Service,
                 PatientCard = card,
+                UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
             };
 
             await _visits.Create(visit);
@@ -83,6 +105,7 @@ namespace DentaClinic.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<VisitDto>> Update(VisitUpdateDto visitDto, int id, int patientCardId)
         {
             var card = await _patientCardsRepository.Get(patientCardId);
@@ -90,6 +113,12 @@ namespace DentaClinic.Controllers
 
             var visit = await _visits.Get(id);
             if (visit == null) return NotFound();
+
+            var authResult = await _authorizationService.AuthorizeAsync(User, visit, PolicyNames.ResourceOwner);
+            if (!authResult.Succeeded)
+            {
+                return Forbid();
+            }
 
             visit.DoctorName = visitDto.DoctorName;
             visit.DoctorSurname = visitDto.DoctorSurname;
@@ -102,6 +131,7 @@ namespace DentaClinic.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<VisitDto>> Delete(int id, int patientCardId)
         {
             var card = await _patientCardsRepository.Get(patientCardId);
@@ -109,6 +139,12 @@ namespace DentaClinic.Controllers
 
             var visit = await _visits.Get(id);
             if (visit == null) return NotFound();
+
+            var authResult = await _authorizationService.AuthorizeAsync(User, visit, PolicyNames.ResourceOwner);
+            if (!authResult.Succeeded)
+            {
+                return Forbid();
+            }
 
             await _visits.Delete(visit);
 

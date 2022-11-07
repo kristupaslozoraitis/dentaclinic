@@ -1,7 +1,10 @@
 ﻿using DentaClinic.Models;
 using DentaClinic.Models.Dtos;
 using DentaClinic.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace DentaClinic.Controllers
 {
@@ -12,15 +15,18 @@ namespace DentaClinic.Controllers
         private readonly IFeedbackRepository _feedbacks;
         private readonly IVisitRepository _visits;
         private readonly IPatientCardRepository _patientCards;
+        private readonly IAuthorizationService _authorizationService;
 
-        public FeedbackController(IFeedbackRepository feedbacks, IVisitRepository visits, IPatientCardRepository patientCards)
+        public FeedbackController(IFeedbackRepository feedbacks, IVisitRepository visits, IPatientCardRepository patientCards, IAuthorizationService authorizationService)
         {
             _feedbacks = feedbacks;
             _visits = visits;
             _patientCards = patientCards;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet]
+        [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<IEnumerable<VisitFeedbackDto>>> GetAll(int patientCardId, int visitId)
         {
             var card = await _patientCards.Get(patientCardId);
@@ -39,6 +45,7 @@ namespace DentaClinic.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<VisitFeedbackDto>> Get(int patientCardId, int visitId, int id)
         {
             var card = await _patientCards.Get(patientCardId);
@@ -57,6 +64,7 @@ namespace DentaClinic.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<VisitFeedbackDto>> Post(int patientCardId, int visitId, VisitFeedbackPostDto visitFeedback)
         {
             var card = await _patientCards.Get(patientCardId);
@@ -65,10 +73,17 @@ namespace DentaClinic.Controllers
             var _visit = await _visits.Get(visitId);
             if (_visit == null) return NotFound();
 
+            var authResult = await _authorizationService.AuthorizeAsync(User, _visit, PolicyNames.ResourceOwner);
+            if (!authResult.Succeeded)
+            {
+                return Forbid();
+            }
+
             var newFeedback = new VisitFeedback
             {
                 Feedback = visitFeedback.Feedback,
                 Visit = _visit,
+                UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
             };
 
             await _feedbacks.Create(newFeedback);
@@ -81,6 +96,7 @@ namespace DentaClinic.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<VisitFeedbackDto>> Update(int patientCardId, int visitId, VisitFeedbackUpdateDto visitFeedbackUpdateDto, int id)
         {
             var card = await _patientCards.Get(patientCardId);
@@ -92,6 +108,12 @@ namespace DentaClinic.Controllers
             var visitFeedback = await _feedbacks.Get(id);
             if (visitFeedback == null) return NotFound();
 
+            var authResult = await _authorizationService.AuthorizeAsync(User, visitFeedback, PolicyNames.ResourceOwner);
+            if (!authResult.Succeeded)
+            {
+                return Forbid();
+            }
+
             visitFeedback.Feedback = visitFeedbackUpdateDto.Feedback;
 
             await _feedbacks.Update(visitFeedback);
@@ -100,6 +122,7 @@ namespace DentaClinic.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<VisitFeedback>> Delete(int patientCardId, int visitId, int id)
         {
             var card = await _patientCards.Get(patientCardId);
@@ -110,6 +133,12 @@ namespace DentaClinic.Controllers
 
             var _visitFeedback = await _feedbacks.Get(id);
             if (_visitFeedback == null) return NotFound();
+
+            var authResult = await _authorizationService.AuthorizeAsync(User, _visitFeedback, PolicyNames.ResourceOwner);
+            if (!authResult.Succeeded)
+            {
+                return Forbid();
+            }
 
             await _feedbacks.Delete(_visitFeedback);
 

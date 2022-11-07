@@ -1,6 +1,8 @@
-﻿namespace DentaClinic.Models
+﻿using DentaClinic.Utils;
+
+namespace DentaClinic.Models
 {
-    public class VisitFeedback
+    public class VisitFeedback : IUserOwnedResource
     {
         public int Id { get; set; }
         public string Feedback { get; set; }

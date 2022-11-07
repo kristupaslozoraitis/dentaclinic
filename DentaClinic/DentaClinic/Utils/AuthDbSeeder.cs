@@ -17,7 +17,26 @@ namespace DentaClinic.Utils
         public async Task SeedAsync()
         {
             await AddDefaultRoles();
-        }   
+            await AddOdontologist();
+        }
+
+        private async Task AddOdontologist()
+        {
+            var newOdontologist = new User
+            {
+                UserName = "odonto@gmail.com",
+                Email = "odonto@gmail.com"
+            };
+            var exists = await _userManager.FindByNameAsync(newOdontologist.UserName);
+            if(exists == null)
+            {
+                var createOdontologistResult = await _userManager.CreateAsync(newOdontologist, "Kristupas123?");
+                if (createOdontologistResult.Succeeded)
+                {
+                    await _userManager.AddToRolesAsync(newOdontologist, Roles.All);
+                }
+            }
+        }
 
         private async Task AddDefaultRoles()
         {
