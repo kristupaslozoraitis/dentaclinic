@@ -69,11 +69,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowedOrigins", policy =>
     {
-        policy.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod();
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
+app.UseCors();
 app.UseSwagger();
 app.UseSwaggerUI();
 // Configure the HTTP request pipeline.
