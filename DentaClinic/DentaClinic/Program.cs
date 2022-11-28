@@ -56,6 +56,8 @@ builder.Services.AddScoped<FeedbackController>();
 builder.Services.AddScoped<IPatientCardRepository, PatientCardRepository>();
 builder.Services.AddScoped<IVisitRepository, VisitRepository>();
 builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IFreeVisitRepository, FreeVisitRepository>();
 builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<AuthDbSeeder>();
 

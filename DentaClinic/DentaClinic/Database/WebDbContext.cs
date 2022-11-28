@@ -12,5 +12,8 @@ namespace DentaClinic.Database
         public DbSet<PatientCard> PatientCards { get; set; }
         public DbSet<Visit> Visits { get; set; }
         public DbSet<VisitFeedback> VisitFeedbacks { get; set; }
+        public DbSet<Service> Services { get; set; }
+        public DbSet<FreeVisit> FreeVisits { get; set; }
+
     }
 }

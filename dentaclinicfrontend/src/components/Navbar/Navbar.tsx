@@ -1,6 +1,7 @@
 import { Box, Button, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, useDisclosure } from "@chakra-ui/react"
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom";
+import { LoginForm } from "../LoginForm";
 
 const NavBar = () => {
     const [openLogin, setOpenLogin] = useState(false);
@@ -13,8 +14,9 @@ const NavBar = () => {
                 height={20}
                 shadow="lg"
                 justifyContent="space-between">
-                <Flex>
+                <Flex gap={10}>
                     <Button onClick={() => navigate("/visitsHistory")}>Vizitų istorija</Button>
+                    <Button>Vizitų administravimas</Button>
                 </Flex>
                 <Flex gap={8}>
                     <Button onClick={() => setOpenLogin(true)}>Prisijungti</Button>
@@ -27,7 +29,7 @@ const NavBar = () => {
                     <ModalHeader>Login form</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        Test
+                        <LoginForm />
                     </ModalBody>
                 </ModalContent>
             </Modal>

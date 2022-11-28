@@ -42,7 +42,7 @@ namespace DentaClinic.Controllers
             return Ok(visits.Select(visit => new VisitDto
             {
                 Id = visit.Id,
-                Time = visit.Time,
+                Time = visit.Date,
                 DoctorName = visit.DoctorName,
                 DoctorSurname = visit.DoctorSurname,
                 Service = visit.Service,
@@ -68,7 +68,7 @@ namespace DentaClinic.Controllers
             return Ok(new VisitDto
             {
                 Id = visit.Id,
-                Time = visit.Time,
+                Time = visit.Date,
                 DoctorName = visit.DoctorName,
                 DoctorSurname = visit.DoctorSurname,
                 Service = visit.Service,
@@ -90,7 +90,7 @@ namespace DentaClinic.Controllers
 
             var visit = new Visit
             {
-                Time = visitDto.Time,
+                Date = visitDto.Time,
                 DoctorName = visitDto.DoctorName,
                 DoctorSurname = visitDto.DoctorSurname,
                 Service = visitDto.Service,
@@ -103,7 +103,7 @@ namespace DentaClinic.Controllers
             return Created($"/api/v1/patientsCards/{patientCardId}/visits/{visit.Id}", new VisitDto
             {
                 Id = visit.Id,
-                Time = visit.Time,
+                Time = visit.Date,
                 DoctorName = visit.DoctorName,
                 DoctorSurname = visit.DoctorSurname,
                 Service = visit.Service,
@@ -129,7 +129,7 @@ namespace DentaClinic.Controllers
             visit.DoctorName = visitDto.DoctorName;
             visit.DoctorSurname = visitDto.DoctorSurname;
             visit.Service = visitDto.Service;
-            visit.Time = visitDto.Time;
+            visit.Date = visitDto.Time;
 
             await _visits.Update(visit);
 

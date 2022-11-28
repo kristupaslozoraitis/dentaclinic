@@ -4,6 +4,7 @@ using DentaClinic.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DentaClinic.Migrations
 {
     [DbContext(typeof(WebDbContext))]
-    partial class WebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221128193502_Added extra tables")]
+    partial class Addedextratables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +52,7 @@ namespace DentaClinic.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("FreeVisits");
+                    b.ToTable("FreeVisit");
                 });
 
             modelBuilder.Entity("DentaClinic.Models.PatientCard", b =>
@@ -120,7 +122,7 @@ namespace DentaClinic.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Services");
+                    b.ToTable("Service");
                 });
 
             modelBuilder.Entity("DentaClinic.Models.User", b =>
@@ -142,14 +144,6 @@ namespace DentaClinic.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");

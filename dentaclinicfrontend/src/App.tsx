@@ -6,7 +6,7 @@ import { HomePage } from './HomePage';
 import { ChakraProvider } from '@chakra-ui/react';
 import { PatientCard } from './Pages/PatientCard';
 import { NavBar } from './components/Navbar/Navbar';
-import { VisitsHistory } from './Pages/VisitsHistory';
+import { VisitsHistory } from './Pages/VisitsHistory/VisitsHistory';
 
 function App() {
   return (
