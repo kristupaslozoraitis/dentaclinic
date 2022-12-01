@@ -1,6 +1,8 @@
-﻿namespace DentaClinic.Models
+﻿using DentaClinic.Utils;
+
+namespace DentaClinic.Models
 {
-    public class Service
+    public class Service : IUserOwnedResource
     {
         public int Id { get; set; }
         public string Name { get; set; }

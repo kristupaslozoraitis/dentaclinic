@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Identity;
 
 namespace DentaClinic.Controllers
 {
@@ -12,12 +13,14 @@ namespace DentaClinic.Controllers
     [Route("api/v1/freeVisits")]
     public class FreeVisitController : ControllerBase
     {
+        private readonly UserManager<User> _userManager;
         private readonly IFreeVisitRepository _freeVisits;
         private readonly IAuthorizationService _authorizationService;
         private readonly IServiceRepository _services;
 
-        public FreeVisitController(IFreeVisitRepository freeVisits, IAuthorizationService authorizationService, IServiceRepository services)
+        public FreeVisitController(UserManager<User> userManager, IFreeVisitRepository freeVisits, IAuthorizationService authorizationService, IServiceRepository services)
         {
+            _userManager = userManager;
             _freeVisits = freeVisits;
             _authorizationService = authorizationService;
             _services = services;
@@ -29,14 +32,17 @@ namespace DentaClinic.Controllers
         {
             var freeVisits = await _freeVisits.GetAll();
 
+            var allServices = await _services.GetAll();
+
             return freeVisits.Select(freeVisit => new FreeVisitDto
             {
+                Id = freeVisit.Id,
                 Date = freeVisit.Date,
                 Time = freeVisit.Time,
                 UserId = freeVisit.UserId,
-                DoctorFullName = string.Format("{0} {1}", freeVisit.User.FirstName, freeVisit.User.LastName),
-                ServiceId = freeVisit.Service.Id,
-                Service = freeVisit.Service.Name
+                DoctorFullName = freeVisit.DoctorFullName,
+                ServiceId = allServices.FirstOrDefault(s => s.Id == freeVisit.ServiceId)!.Id,
+                Service = allServices.FirstOrDefault(s => s.Id == freeVisit.ServiceId)!.Name
             });
         }
 
@@ -47,6 +53,8 @@ namespace DentaClinic.Controllers
             var freeVisit = await _freeVisits.Get(id);
             if (freeVisit == null) return NotFound();
 
+            var allServices = await _services.GetAll();
+
             var authResult = await _authorizationService.AuthorizeAsync(User, freeVisit, PolicyNames.ResourceOwner);
             if (!authResult.Succeeded)
             {
@@ -55,38 +63,42 @@ namespace DentaClinic.Controllers
 
             return Ok(new FreeVisitDto
             {
+                Id = freeVisit.Id,
                 Date = freeVisit.Date,
                 Time = freeVisit.Time,
                 UserId = freeVisit.UserId,
-                DoctorFullName = string.Format("{0} {1}", freeVisit.User.FirstName, freeVisit.User.LastName),
-                ServiceId = freeVisit.Service.Id,
-                Service = freeVisit.Service.Name
+                DoctorFullName = freeVisit.DoctorFullName,
+                ServiceId = allServices.FirstOrDefault(s => s.Id == freeVisit.ServiceId)!.Id,
+                Service = allServices.FirstOrDefault(s => s.Id == freeVisit.ServiceId)!.Name
             });
         }
 
         [HttpPost]
         [Authorize(Roles = Roles.Odontologist)]
-        public async Task<ActionResult<ServiceDto>> Post(FreeVisitPostDto freeVisit)
+        public async Task<ActionResult<FreeVisitDto>> Post(FreeVisitPostDto freeVisit)
         {
             var service = await _services.Get(freeVisit.ServiceId);
             if (service == null) return NotFound();
+            var user = await _userManager.FindByIdAsync(User.FindFirstValue(JwtRegisteredClaimNames.Sub));
 
             var newFreeVisit = new FreeVisit
             {
                 Date = freeVisit.Date,
                 Time = freeVisit.Time,
                 UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub),
+                DoctorFullName = string.Format("{0} {1}", user.FirstName, user.LastName),
                 Service = service,
             };
 
             await _freeVisits.Create(newFreeVisit);
+
 
             return Created($"/api/v1/freeVisits/{newFreeVisit.Id}", new FreeVisitDto
             {
                 Date = newFreeVisit.Date,
                 Time = newFreeVisit.Time,
                 UserId = newFreeVisit.UserId,
-                DoctorFullName = string.Format("{0} {1}", newFreeVisit.User.FirstName, newFreeVisit.User.LastName),
+                DoctorFullName = newFreeVisit.DoctorFullName,
                 ServiceId = newFreeVisit.Service.Id,
                 Service = newFreeVisit.Service.Name
             });

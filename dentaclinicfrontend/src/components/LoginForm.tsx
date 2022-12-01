@@ -16,17 +16,15 @@ const LoginForm = () => {
 
     const Login = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
-        const data = await fetch("https://dentaclinic20221015140303.azurewebsites.net/api/login", {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                method: 'POST',
-                body: JSON.stringify({ email, password })
+        const data = await fetch("https://localhost:7257/api/login", {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify({ email, password })
         })
         const token = await data.json();
-        console.log(token);
-        const user = jwtDecode(token.accessToken);
-        console.log(user);
+        localStorage.setItem("accessToken", token.accessToken);
     }
 
     return (

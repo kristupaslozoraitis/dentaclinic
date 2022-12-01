@@ -29,6 +29,7 @@ namespace DentaClinic.Controllers
 
             return services.Select(service => new ServiceDto
             {
+                Id = service.Id,
                 Name = service.Name,
             });
         }
@@ -48,6 +49,7 @@ namespace DentaClinic.Controllers
 
             return Ok(new ServiceDto
             {
+                Id = id,
                 Name = service.Name
             });
         }
@@ -70,22 +72,22 @@ namespace DentaClinic.Controllers
             });
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         [Authorize(Roles = Roles.Odontologist)]
-        public async Task<ActionResult<ServiceDto>> Update(ServicePostDto serviceDto, int id)
+        public async Task<ActionResult<ServiceDto>> Update([FromBody] List<ServiceUpdateDto> services)
         {
-            var service = await _services.Get(id);
-            if (service == null) return NotFound();
-
-            var authResult = await _authorizationService.AuthorizeAsync(User, service, PolicyNames.ResourceOwner);
-            if (!authResult.Succeeded)
+            foreach (var service in services)
             {
-                return Forbid();
+                var serviceFromDb = await _services.Get(service.Id);
+                if (serviceFromDb == null) return NotFound();
+                var authResult = await _authorizationService.AuthorizeAsync(User, serviceFromDb, PolicyNames.ResourceOwner);
+                if (!authResult.Succeeded)
+                {
+                    return Forbid();
+                }
+                serviceFromDb.Name = service.Name;
+                await _services.Update(serviceFromDb);
             }
-
-            service.Name = serviceDto.Name;
-
-            await _services.Update(service);
 
             return Ok();
         }

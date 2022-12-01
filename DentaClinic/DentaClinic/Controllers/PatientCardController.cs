@@ -44,16 +44,10 @@ namespace DentaClinic.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Roles = Roles.RegisteredUser)]
-        public async Task<ActionResult<PatientCardDto>> Get(int id)
+        public async Task<ActionResult<PatientCardDto>> GetMyPatientCard(string id)
         {
             var card = await _patientCards.Get(id);
             if (card == null) return NotFound();
-
-            var authResult = await _authorizationService.AuthorizeAsync(User, card, PolicyNames.ResourceOwner);
-            if (!authResult.Succeeded)
-            {
-                return Forbid();
-            }
 
             return Ok(new PatientCardDto
             {
@@ -104,7 +98,7 @@ namespace DentaClinic.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = Roles.RegisteredUser)]
-        public async Task<ActionResult<PatientCard>> Update(PatientCardUpdateDto patientCardDto, int id)
+        public async Task<ActionResult<PatientCard>> Update(PatientCardUpdateDto patientCardDto, string id)
         {
             var card = await _patientCards.Get(id);
             if (card == null) return NotFound();
@@ -127,7 +121,7 @@ namespace DentaClinic.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Roles = Roles.Odontologist)]
-        public async Task<ActionResult<PatientCard>> Delete(int id)
+        public async Task<ActionResult<PatientCard>> Delete(string id)
         {
             var card = await _patientCards.Get(id);
             if (card == null) return NotFound();

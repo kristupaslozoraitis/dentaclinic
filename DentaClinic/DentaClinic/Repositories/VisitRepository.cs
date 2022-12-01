@@ -6,7 +6,7 @@ namespace DentaClinic.Repositories
 {
     public interface IVisitRepository
     {
-        Task<List<Visit>> GetAll(int patientCardId);
+        Task<List<Visit>> GetAll(string patientCardId);
         Task<Visit> Get(int id);
         Task<Visit> Create(Visit patientCard);
         Task<Visit> Update(Visit patientCard);
@@ -40,9 +40,9 @@ namespace DentaClinic.Repositories
             return await _dbContext.Visits.FirstOrDefaultAsync(visit => visit.Id == id);
         }
 
-        public async Task<List<Visit>> GetAll(int patientCardId)
+        public async Task<List<Visit>> GetAll(string patientCardId)
         {
-            return await _dbContext.Visits.Where(visit => visit.PatientCard.Id == patientCardId).ToListAsync();
+            return await _dbContext.Visits.Where(visit => visit.PatientCard.UserId == patientCardId).ToListAsync();
         }
 
         public async Task<Visit> Update(Visit visit)

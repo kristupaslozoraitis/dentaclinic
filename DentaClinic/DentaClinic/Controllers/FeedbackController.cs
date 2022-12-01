@@ -27,7 +27,7 @@ namespace DentaClinic.Controllers
 
         [HttpGet]
         [Authorize(Roles = Roles.RegisteredUser)]
-        public async Task<ActionResult<IEnumerable<VisitFeedbackDto>>> GetAll(int patientCardId, int visitId)
+        public async Task<ActionResult<IEnumerable<VisitFeedbackDto>>> GetAll(string patientCardId, int visitId)
         {
             var card = await _patientCards.Get(patientCardId);
             if (card == null) return NotFound();
@@ -46,7 +46,7 @@ namespace DentaClinic.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Roles = Roles.RegisteredUser)]
-        public async Task<ActionResult<VisitFeedbackDto>> Get(int patientCardId, int visitId, int id)
+        public async Task<ActionResult<VisitFeedbackDto>> Get(string patientCardId, int visitId, int id)
         {
             var card = await _patientCards.Get(patientCardId);
             if (card == null) return NotFound();
@@ -65,7 +65,7 @@ namespace DentaClinic.Controllers
 
         [HttpPost]
         [Authorize(Roles = Roles.RegisteredUser)]
-        public async Task<ActionResult<VisitFeedbackDto>> Post(int patientCardId, int visitId, VisitFeedbackPostDto visitFeedback)
+        public async Task<ActionResult<VisitFeedbackDto>> Post(string patientCardId, int visitId, VisitFeedbackPostDto visitFeedback)
         {
             var card = await _patientCards.Get(patientCardId);
             if (card == null) return NotFound();
@@ -97,7 +97,7 @@ namespace DentaClinic.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = Roles.RegisteredUser)]
-        public async Task<ActionResult<VisitFeedbackDto>> Update(int patientCardId, int visitId, VisitFeedbackUpdateDto visitFeedbackUpdateDto, int id)
+        public async Task<ActionResult<VisitFeedbackDto>> Update(string patientCardId, int visitId, VisitFeedbackUpdateDto visitFeedbackUpdateDto, int id)
         {
             var card = await _patientCards.Get(patientCardId);
             if (card == null) return NotFound();
@@ -123,7 +123,7 @@ namespace DentaClinic.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Roles = Roles.RegisteredUser)]
-        public async Task<ActionResult<VisitFeedback>> Delete(int patientCardId, int visitId, int id)
+        public async Task<ActionResult<VisitFeedback>> Delete(string patientCardId, int visitId, int id)
         {
             var card = await _patientCards.Get(patientCardId);
             if (card == null) return NotFound();

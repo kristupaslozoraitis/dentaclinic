@@ -1,38 +1,92 @@
-import { Box, Button, Flex, Select, SimpleGrid } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { Card, CardBody, CardHeader } from "@chakra-ui/card";
+import { Box, Button, Flex, Select, SimpleGrid, Heading, Stack, StackDivider, Text } from "@chakra-ui/react";
+import jwtDecode from "jwt-decode";
+import moment from "moment";
+import React, { useCallback, useEffect, useState } from "react";
+import { FreeVisit } from "../VisitsAdminPanel/types";
 
 const FreeVisitsView = () => {
-    const [test, setTest] = useState([10, 20, 30, 40]);
+    const [freeVisits, setFreeVisits] = useState<FreeVisit[]>([]);
+    const token = localStorage.getItem("accessToken");
+    const userId = jwtDecode(token as string) as any;
+
+    const getVisits = useCallback(async () => {
+        const myServices = await fetch(`https://localhost:7257/api/v1/freeVisits`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            method: 'GET',
+        })
+        const allVisits = await myServices.json();
+        setFreeVisits(allVisits);
+    }, [])
+
+    useEffect(() => {
+        getVisits();
+    }, [getVisits]);
+
+    const register = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, visit: FreeVisit): Promise<void> => {
+        const visitDto = {
+            time: visit.time,
+            date: visit.date,
+            doctorName: visit.doctorFullName.split(" ")[0],
+            doctorSurname: visit.doctorFullName.split(" ")[1],
+            service: visit.service,
+            freeVisitId: visit.id
+        }
+        await fetch(`https://localhost:7257/api/v1/patientCards/${userId.sub}/visits`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            method: 'POST',
+            body: JSON.stringify(visitDto)
+        })
+    }
+
     return (
         <Box>
-            <Box w={200} mt={5}>
-                <Select placeholder="Choose doc">
-                    <option value='1'>Gyd1</option>
-                    <option value='2'>Gyd2</option>
-                    <option value='0'>Any</option>
-                </Select>
-            </Box>
             <SimpleGrid columns={3} spacing={10} mt={5}>
-                {test.map(() => {
+                {freeVisits.map((freeVisit, index) => {
                     return (
-                        <Flex bg='grey' direction="column">
-                            <Flex justifyContent="center">
-                                Gydytojas1
-                            </Flex>
-                            <Flex direction="column" m={3}>
-                                <Box>
-                                    <Box fontWeight="bold">Data:</Box>
-                                    <Box ml={3}>2022-11-25</Box>
-                                    <Box fontWeight="bold">Laikas:</Box>
-                                    <Box ml={3}>17:30</Box>
-                                    <Box fontWeight="bold">Paslauga: </Box>
-                                    <Box ml={3}>Burnos higiena</Box>
-                                </Box>
-                                <Flex justifyContent="end" m={5}>
-                                    <Button bg="red.700">Registruotis</Button>
-                                </Flex>
-                            </Flex>
-                        </Flex>
+                        <Card key={index} border='solid' borderRadius={10}>
+                            <CardHeader m={5} textAlign='center'>
+                                <Heading size='md'>{freeVisit.doctorFullName}</Heading>
+                            </CardHeader>
+
+                            <CardBody m={5}>
+                                <Stack divider={<StackDivider />} spacing='4'>
+                                    <Box>
+                                        <Heading size='xs' textTransform='uppercase'>
+                                            Data
+                                        </Heading>
+                                        <Text pt='2' fontSize='sm'>
+                                            {moment(freeVisit.date).format("YYYY-MM-DD")}
+                                        </Text>
+                                    </Box>
+                                    <Box>
+                                        <Heading size='xs' textTransform='uppercase'>
+                                            Laikas
+                                        </Heading>
+                                        <Text pt='2' fontSize='sm'>
+                                            {freeVisit.time}
+                                        </Text>
+                                    </Box>
+                                    <Box>
+                                        <Heading size='xs' textTransform='uppercase'>
+                                            Paslauga
+                                        </Heading>
+                                        <Text pt='2' fontSize='sm'>
+                                            {freeVisit.service}
+                                        </Text>
+                                    </Box>
+                                    <Flex justifyContent='end'>
+                                        <Button onClick={(e) => register(e, freeVisit)}>Registruotis</Button>
+                                    </Flex>
+                                </Stack>
+                            </CardBody>
+                        </Card>
                     )
                 })}
             </SimpleGrid>

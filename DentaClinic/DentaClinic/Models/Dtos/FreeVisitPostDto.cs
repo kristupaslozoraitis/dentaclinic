@@ -1,10 +1,14 @@
-﻿namespace DentaClinic.Models.Dtos
+﻿using System.Text.Json.Serialization;
+
+namespace DentaClinic.Models.Dtos
 {
     public class FreeVisitPostDto
     {
+        [JsonPropertyName("date")]
         public DateTime Date { get; set; }
+        [JsonPropertyName("time")]
         public string Time { get; set; }
-        public string UserId { get; set; }
+        [JsonPropertyName("serviceId")]
         public int ServiceId { get; set; }
     }
 }

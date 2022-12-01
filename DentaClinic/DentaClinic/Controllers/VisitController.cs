@@ -14,19 +14,21 @@ namespace DentaClinic.Controllers
     {
         private readonly IPatientCardRepository _patientCardsRepository;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IFreeVisitRepository _freeVisits;
         private readonly IVisitRepository _visits;
 
-        public VisitController(IVisitRepository visits, IPatientCardRepository patientCardRepository, IAuthorizationService authorizationService)
+        public VisitController(IFreeVisitRepository freeVisits, IVisitRepository visits, IPatientCardRepository patientCardRepository, IAuthorizationService authorizationService)
         {
             _patientCardsRepository = patientCardRepository;
             _authorizationService = authorizationService;
+            _freeVisits = freeVisits;
             _visits = visits;
 
         }
 
         [HttpGet]
         [Authorize(Roles = Roles.RegisteredUser)]
-        public async Task<ActionResult<IEnumerable<VisitDto>>> GetAll(int patientCardId)
+        public async Task<ActionResult<IEnumerable<VisitDto>>> GetAll(string patientCardId)
         {
             var card = await _patientCardsRepository.Get(patientCardId);
             if (card == null) return NotFound();
@@ -42,16 +44,16 @@ namespace DentaClinic.Controllers
             return Ok(visits.Select(visit => new VisitDto
             {
                 Id = visit.Id,
-                Time = visit.Date,
-                DoctorName = visit.DoctorName,
-                DoctorSurname = visit.DoctorSurname,
+                Date = visit.Date,
+                Time = visit.Time,
+                DoctorFullName = string.Format("{0} {1}", visit.DoctorName, visit.DoctorSurname),
                 Service = visit.Service,
             }));
         }
 
         [HttpGet("{id}")]
         [Authorize(Roles = Roles.RegisteredUser)]
-        public async Task<ActionResult<VisitDto>> Get(int id, int patientCardId)
+        public async Task<ActionResult<VisitDto>> Get(int id, string patientCardId)
         {
             var card = await _patientCardsRepository.Get(patientCardId);
             if (card == null) return NotFound();
@@ -68,16 +70,16 @@ namespace DentaClinic.Controllers
             return Ok(new VisitDto
             {
                 Id = visit.Id,
-                Time = visit.Date,
-                DoctorName = visit.DoctorName,
-                DoctorSurname = visit.DoctorSurname,
+                Date = visit.Date,
+                Time = visit.Time,
+                DoctorFullName = string.Format("{0} {1}", visit.DoctorName, visit.DoctorSurname),
                 Service = visit.Service,
             });
         }
 
         [HttpPost]
         [Authorize(Roles = Roles.RegisteredUser)]
-        public async Task<ActionResult<VisitDto>> Post(VisitPostDto visitDto, int patientCardId)
+        public async Task<ActionResult<VisitDto>> Post(VisitPostDto visitDto, string patientCardId)
         {
             var card = await _patientCardsRepository.Get(patientCardId);
             if (card == null) return NotFound();
@@ -88,14 +90,19 @@ namespace DentaClinic.Controllers
                 return Forbid();
             }
 
+            var freeVisit = await _freeVisits.Get(visitDto.FreeVisitId);
+            if (freeVisit == null) return NotFound();
+
             var visit = new Visit
             {
-                Date = visitDto.Time,
+                Date = visitDto.Date,
+                Time = visitDto.Time,
                 DoctorName = visitDto.DoctorName,
                 DoctorSurname = visitDto.DoctorSurname,
                 Service = visitDto.Service,
                 PatientCard = card,
-                UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+                UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub),
+                FreeVisit = freeVisit
             };
 
             await _visits.Create(visit);
@@ -103,16 +110,16 @@ namespace DentaClinic.Controllers
             return Created($"/api/v1/patientsCards/{patientCardId}/visits/{visit.Id}", new VisitDto
             {
                 Id = visit.Id,
-                Time = visit.Date,
-                DoctorName = visit.DoctorName,
-                DoctorSurname = visit.DoctorSurname,
+                Date = visit.Date,
+                Time = visit.Time,
+                DoctorFullName = string.Format("{0} {1}", visit.DoctorName, visit.DoctorSurname),
                 Service = visit.Service,
             });
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = Roles.RegisteredUser)]
-        public async Task<ActionResult<VisitDto>> Update(VisitUpdateDto visitDto, int id, int patientCardId)
+        public async Task<ActionResult<VisitDto>> Update(VisitUpdateDto visitDto, int id, string patientCardId)
         {
             var card = await _patientCardsRepository.Get(patientCardId);
             if (card == null) return NotFound();
@@ -138,7 +145,7 @@ namespace DentaClinic.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Roles = Roles.RegisteredUser)]
-        public async Task<ActionResult<VisitDto>> Delete(int id, int patientCardId)
+        public async Task<ActionResult<VisitDto>> Delete(int id, string patientCardId)
         {
             var card = await _patientCardsRepository.Get(patientCardId);
             if (card == null) return NotFound();
