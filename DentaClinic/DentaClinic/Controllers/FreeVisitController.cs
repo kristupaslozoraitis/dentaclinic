@@ -46,6 +46,41 @@ namespace DentaClinic.Controllers
             });
         }
 
+        [HttpGet]
+        [Route("admin")]
+        [Authorize(Roles = Roles.Odontologist)]
+        public async Task<IEnumerable<FreeVisitForOdontologistDto>> GetAllForOdontologist()
+        {
+            var freeVisits = await _freeVisits.GetAllForOdontologist(User.FindFirstValue(JwtRegisteredClaimNames.Sub));
+
+            var allServices = await _services.GetAll();
+
+            List<FreeVisitForOdontologistDto> newList = new List<FreeVisitForOdontologistDto>();
+            foreach (var freeVisit in freeVisits)
+            {
+                var visit = await _freeVisits.GetAllOrderedVisitsForOdontologist(freeVisit.Id);
+                string patient = string.Empty;
+                if(visit != null)
+                {
+                    patient = visit.Patient;
+                }
+                newList.Add(new FreeVisitForOdontologistDto
+                {
+                    Id = freeVisit.Id,
+                    Date = freeVisit.Date,
+                    Time = freeVisit.Time,
+                    UserId = freeVisit.UserId,
+                    DoctorFullName = freeVisit.DoctorFullName,
+                    ServiceId = freeVisit.ServiceId,
+                    Service = freeVisit.Service.Name,
+                    Patient = patient
+                });
+            }
+
+
+            return newList;
+        }
+
         [HttpGet("{id}")]
         [Authorize(Roles = Roles.RegisteredUser)]
         public async Task<ActionResult<FreeVisitDto>> Get(int id)

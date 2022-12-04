@@ -10,4 +10,5 @@ export interface FreeVisit{
     doctorFullName: string;
     service: string;
     id: number;
+    patient: string;
 }

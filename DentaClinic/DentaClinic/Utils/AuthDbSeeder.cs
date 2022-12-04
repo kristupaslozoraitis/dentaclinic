@@ -25,7 +25,9 @@ namespace DentaClinic.Utils
             var newOdontologist = new User
             {
                 UserName = "odonto@gmail.com",
-                Email = "odonto@gmail.com"
+                Email = "odonto@gmail.com",
+                FirstName = "Petras",
+                LastName = "Petraitis"
             };
             var exists = await _userManager.FindByNameAsync(newOdontologist.UserName);
             if(exists == null)
