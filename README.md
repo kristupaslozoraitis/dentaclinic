@@ -28,6 +28,32 @@ Sistemai kurti bus naudojamos šios technologijos:
 - BackEnd daliai .NET 6 Core,
 - Duomenų bazė MsSQL
 
+## Vartotojo sąsajos langai
+
+### Pagrindinis langas
+![image](https://user-images.githubusercontent.com/65513238/205515565-81c07c9f-e03b-4b0e-87b4-86eacf4c9f5a.png)
+### Prisijungimo forma
+![image](https://user-images.githubusercontent.com/65513238/205515574-26278149-f551-4938-9180-203368cefb2f.png)
+### Registracijos formos 1 žingsnis
+![image](https://user-images.githubusercontent.com/65513238/205515578-b31bc959-706f-40ba-9efd-a8dc44d22d4c.png)
+### Registracijos formos 2 žingsnis
+![image](https://user-images.githubusercontent.com/65513238/205515585-c1d2652d-14c7-4225-8eb8-1adeb0c71f9e.png)
+### Vizitų istorijos langas
+![image](https://user-images.githubusercontent.com/65513238/205515608-7376c61c-4dc9-4cc6-9c8e-cfd36e89e39e.png)
+### Laisvų vizitų langas
+![image](https://user-images.githubusercontent.com/65513238/205515618-b1d04bff-e19f-4f4d-a856-26528fb64d63.png)
+### Paciento kortelės langas
+![image](https://user-images.githubusercontent.com/65513238/205515623-1a1ed97d-b569-4afd-80e6-90f26785ca97.png)
+### Odontologo vizitų administravimo langas
+![image](https://user-images.githubusercontent.com/65513238/205515653-76084234-fdd8-41b7-8531-ecaf83875289.png)
+### Paslaugų redagavimo langas
+![image](https://user-images.githubusercontent.com/65513238/205515666-d4dd9c8b-01f8-4031-8c17-5d9a44d3273e.png)
+### Naujos paslaugos forma
+![image](https://user-images.githubusercontent.com/65513238/205515676-36dd6078-627e-4d89-b09b-bca2092f7bc8.png)
+### Naujo vizito sukūrimo forma
+![image](https://user-images.githubusercontent.com/65513238/205515681-0837d4dc-4c77-4e70-af76-f9eacdda755d.png)
+
+
 ## Api specifikacija
 
 ### Auth
@@ -70,3 +96,7 @@ Sistemai kurti bus naudojamos šios technologijos:
 - GET "/api/v1/patientCards/{patientCardId}/visits/{id}" skirtas užregistruoto vizito gavimui pagal jo id
 - PUT "/api/v1/patientCards/{patientCardId}/visits/{id}" skirtas užregistruoto vizito atnaujinimui
 - DELETE "/api/v1/patientCards/{patientCardId}/visits/{id}" skirtas užregistruoto vizito atšaukimui
+
+## IŠVADA
+- Projektas realizuotas pagal aprašytus funkcinius reikalavimus. Visas funkcionalumas veikia kaip ir priklauso. Žinoma yra ir taisytinų dalykų - geresnis responsive layout, nukreipimų į specifinius puslapius pasibaigus sesijos galiojimui tobulinimas
+
