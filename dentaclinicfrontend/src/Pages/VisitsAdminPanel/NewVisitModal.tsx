@@ -29,7 +29,7 @@ interface NewVisitModalProps {
   ) => void;
   date: Date;
   time: string;
-  serviceId: number;
+  serviceId: number | undefined;
 }
 
 const NewVisitModal = ({

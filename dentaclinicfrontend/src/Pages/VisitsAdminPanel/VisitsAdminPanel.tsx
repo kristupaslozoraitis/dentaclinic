@@ -36,13 +36,16 @@ const VisitsAdminPanel = () => {
 
   const getData = useCallback(async () => {
     var token = localStorage.getItem("accessToken");
-    const myServices = await fetch("https://dentaclinic20221015140303.azurewebsites.net/api/v1/services", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      method: "GET",
-    });
+    const myServices = await fetch(
+      "https://dentaclinic20221015140303.azurewebsites.net/api/v1/services",
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        method: "GET",
+      }
+    );
     if (myServices.status !== 200) {
       if (myServices.status === 401) {
         navigate("/");
@@ -94,14 +97,17 @@ const VisitsAdminPanel = () => {
   const onSave = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     var token = localStorage.getItem("accessToken");
-    const response = await fetch("https://dentaclinic20221015140303.azurewebsites.net/api/v1/services", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(services),
-      method: "PUT",
-    });
+    const response = await fetch(
+      "https://dentaclinic20221015140303.azurewebsites.net/api/v1/services",
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(services),
+        method: "PUT",
+      }
+    );
     if (response.status === 200) {
       toast({
         position: "bottom-right",
@@ -116,14 +122,17 @@ const VisitsAdminPanel = () => {
   const onCreate = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     var token = localStorage.getItem("accessToken");
-    const response = await fetch("https://dentaclinic20221015140303.azurewebsites.net/api/v1/services", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ name: newService }),
-      method: "POST",
-    });
+    const response = await fetch(
+      "https://dentaclinic20221015140303.azurewebsites.net/api/v1/services",
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: newService }),
+        method: "POST",
+      }
+    );
     if (response.status === 201) {
       toast({
         position: "bottom-right",
@@ -178,13 +187,16 @@ const VisitsAdminPanel = () => {
   const getRoles = useCallback(async () => {
     setIsLoading(true);
     var token = localStorage.getItem("accessToken");
-    const data = await fetch("https://dentaclinic20221015140303.azurewebsites.net/api/me", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      method: "GET",
-    });
+    const data = await fetch(
+      "https://dentaclinic20221015140303.azurewebsites.net/api/me",
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        method: "GET",
+      }
+    );
     const roles = await data.json();
     if (!roles.includes("Odontologist")) {
       navigate("/");
@@ -203,6 +215,7 @@ const VisitsAdminPanel = () => {
 
   const closeVisitModal = () => {
     setIsNewVisitOpen(false);
+    setIsEditing(false);
   };
 
   const handleServiceChange = (value: string, index: number): void => {
@@ -238,7 +251,7 @@ const VisitsAdminPanel = () => {
     setIsNewVisitOpen(true);
   };
 
-  return isLoading ? null : (
+  return (
     <>
       <Box m={5}>
         <Flex gap={10} mt={5} justifyContent="end">
@@ -326,7 +339,7 @@ const VisitsAdminPanel = () => {
         handleServiceIdChange={handleServiceIdChange}
         date={date}
         time={time}
-        serviceId={serviceId as number}
+        serviceId={isEditing ? serviceId : undefined}
       />
     </>
   );
