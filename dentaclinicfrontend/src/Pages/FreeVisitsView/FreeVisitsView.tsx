@@ -8,6 +8,7 @@ import {
   Stack,
   StackDivider,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import jwtDecode from "jwt-decode";
 import moment from "moment";
@@ -16,17 +17,21 @@ import { FreeVisit } from "../VisitsAdminPanel/types";
 
 const FreeVisitsView = () => {
   const [freeVisits, setFreeVisits] = useState<FreeVisit[]>([]);
+  const toast = useToast();
   const token = localStorage.getItem("accessToken");
   const userId = token && (jwtDecode(token as string) as any);
 
   const getVisits = useCallback(async () => {
-    const myServices = await fetch(`https://dentaclinic20221015140303.azurewebsites.net/api/v1/freeVisits`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      method: "GET",
-    });
+    const myServices = await fetch(
+      `https://dentaclinic20221015140303.azurewebsites.net/api/v1/freeVisits`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        method: "GET",
+      }
+    );
     const allVisits = await myServices.json();
     setFreeVisits(allVisits);
   }, []);
@@ -43,7 +48,7 @@ const FreeVisitsView = () => {
       service: visit.service,
       freeVisitId: visit.id,
     };
-    await fetch(
+    const response = await fetch(
       `https://dentaclinic20221015140303.azurewebsites.net/api/v1/patientCards/${userId.sub}/visits`,
       {
         headers: {
@@ -54,6 +59,14 @@ const FreeVisitsView = () => {
         body: JSON.stringify(visitDto),
       }
     );
+    if (response.status === 201) {
+      toast({
+        position: "bottom-right",
+        title: "Registracija sėkminga",
+        status: "success",
+        isClosable: true,
+      });
+    }
   };
 
   useEffect(() => {
@@ -61,7 +74,7 @@ const FreeVisitsView = () => {
   }, [getVisits, register]);
 
   return (
-    <Box>
+    <Box m={5}>
       <SimpleGrid columns={3} spacing={10} mt={5}>
         {freeVisits.map((freeVisit, index) => {
           return (
