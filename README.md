@@ -28,6 +28,9 @@ Sistemai kurti bus naudojamos šios technologijos:
 - BackEnd daliai .NET 6 Core,
 - Duomenų bazė MsSQL
 
+## UML Deployment diagrama
+![image](https://user-images.githubusercontent.com/65513238/205516536-4e74525c-9651-49af-9e17-bffb381f600d.png)
+
 ## Vartotojo sąsajos langai
 
 ### Pagrindinis langas
