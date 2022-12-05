@@ -29,7 +29,7 @@ Sistemai kurti bus naudojamos šios technologijos:
 - Duomenų bazė MsSQL
 
 ## UML Deployment diagrama
-![image](https://user-images.githubusercontent.com/65513238/205516536-4e74525c-9651-49af-9e17-bffb381f600d.png)
+![image](https://user-images.githubusercontent.com/65513238/205676755-657c8505-53b2-4404-882b-d4b8bee6e0e9.png)
 
 ## Vartotojo sąsajos langai
 
